@@ -68,7 +68,7 @@ p {
 	left: 25%;
 	margin-bottom: 0.7em;
 	margin-right: 0;
-	width: 65%;
+	width: 60%;
 }
 
 .csl-left-margin {
@@ -89,14 +89,14 @@ p {
 
 code {
 	font: normal normal;
-	font-size: 90%;
+	font-size: 100%;
 	font-family: Menlo, monospace, sans-serif;
 	color: #aaa;
 }
 
 p code {
 	position: absolute;
-	left: -10%;
+	left: -15%;
 }
 
 
