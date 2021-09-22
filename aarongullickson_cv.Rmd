@@ -4,24 +4,45 @@ name: Aaron
 surname: Gullickson
 position: "Associate Professor"
 address: "Department of Sociology, University of Oregon"
-phone: (541) 555-1111
+phone: (541) 346-50161
 www: aarongullickson.netlify.app
 email: "aarong@uoregon.edu"
-#twitter: AaronGullickson
-#github: AaronGullickson
+headcolor: "000080"
+twitter: AaronGullickson
+github: AaronGullickson
 #linkedin: mariecurie
-date: "`r format(Sys.time(), '%B %Y')`"
+date: "`r format(Sys.time(), '%B %d %Y')`"
 #aboutme: "Marie is a Polish and naturalized-French physicist and chemist who conducts pioneering research on radioactivity."
-output: 
-  vitae::markdowncv:
-    theme: blmoore
+output: vitae::hyndman
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 library(vitae)
 library(tibble)
+library(tidyverse)
+library(stringr)
+library(glue)
 ```
+
+```{r functions}
+# a bunch of headaches to get markdown code out of here
+extract_title <- function(text) {
+   extract <- str_extract(text, pattern = "(?<=\\[).*(?=\\])")
+   text[!is.na(extract)] <- na.omit(extract)
+   return(text)
+}
+
+remove_asterisks <- function(text) {
+   str_remove_all(text, "\\*")
+}
+
+#this is a hack but it will work ... for now
+fix_with <- function(text) {
+   str_remove_all(text, ";.*|\\[.*\\]|\\(.*\\)")
+}
+```
+
 
 ```{r read-data, include=FALSE}
 data_location = "https://docs.google.com/spreadsheets/d/1scjvE65qm5YXS-JG4-CRPiLEqsz6p4y34WX6ipEct_w/edit#gid=917338460"
@@ -29,27 +50,29 @@ cv_data <- googlesheets4::read_sheet(data_location, sheet = "entries",
                                      skip = 1, col_types = "c")
 ```
 
+An online CV with embedded links is available **[here](https://aarongullickson.netlify.app/cv/)**
+
 ## Employment
 
-```{r}
+```{r employment}
 cv_data %>%
    filter(section=="employment") %>%
    detailed_entries(
-     what=org,
-     with=other,
-     where=title,
+     what=what,
+     with=with,
+     where=where,
      when=when)
 ```
 
 ## Education
 
-```{r}
+```{r education}
 cv_data %>%
    filter(section=="education") %>%
    detailed_entries(
-     what=org,
-     with=other,
-     where=title,
+     what=what,
+     with=with,
+     where=where,
      when=when)
 ```
 
@@ -58,11 +81,16 @@ cv_data %>%
 ```{r pubs}
  cv_data %>%
    filter(section=="academic_articles") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     with=other,
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
 
 ## Grants Awarded
@@ -70,11 +98,16 @@ cv_data %>%
 ```{r grants}
  cv_data %>%
    filter(section=="grants_awarded") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     with=other,
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
 
 ## Recent Presentations
@@ -84,11 +117,16 @@ cv_data %>%
 ```{r invited}
 cv_data %>%
    filter(section=="invited_talks") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     with=other,
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
 
 ### Conferences
@@ -96,24 +134,95 @@ cv_data %>%
 ```{r conferences}
 cv_data %>%
    filter(section=="conference_talks") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     with=other,
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
 
 ## Courses Taught
 
+```{r courses-taught}
+cv_data %>%
+   filter(section=="classes_taught") %>%
+   detailed_entries(what=what,
+                    where=where,
+                    why=description_1)
+```
+
 ## Student Advising
 
-```{r advising}
+### Dissertations Advised
+
+```{r diss-advise}
 cv_data %>%
-   filter(section=="students_advised") %>%
+   filter(section=="diss_advised") %>%
+   mutate(what=remove_asterisks(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
+```
+
+### Comprehensive Exams Advised
+
+```{r comp-advise}
+cv_data %>%
+   filter(section=="comp_advised") %>%
+   mutate(what=remove_asterisks(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
+   detailed_entries(
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
+```
+
+### Masters Papers Advised
+
+```{r ma-advise}
+cv_data %>%
+   filter(section=="master_advised") %>%
+   mutate(what=remove_asterisks(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
+   detailed_entries(
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
+```
+
+### Undergraduates Advised
+```{r undergrad-advise}
+cv_data %>%
+   filter(section=="undergrad_advised") %>%
+   mutate(what=remove_asterisks(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
+   detailed_entries(
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
 
 ## Service
@@ -123,11 +232,16 @@ cv_data %>%
 ```{r service-dept}
 cv_data %>%
    filter(section=="service_department") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     with=other,
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
 
 ### University
@@ -135,11 +249,16 @@ cv_data %>%
 ```{r service-univ}
 cv_data %>%
    filter(section=="service_university") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     with=other,
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
 
 ### Professional
@@ -147,9 +266,14 @@ cv_data %>%
 ```{r service-prof}
 cv_data %>%
    filter(section=="service_professional") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
    detailed_entries(
-     what=paste(org, ".", sep=""),
-     with=other,
-     where=paste(title, ".", sep=""),
-     when=when)
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
 ```
