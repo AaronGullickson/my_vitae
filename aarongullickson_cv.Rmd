@@ -7,13 +7,15 @@ address: "Department of Sociology, University of Oregon"
 phone: (541) 346-50161
 www: aarongullickson.netlify.app
 email: "aarong@uoregon.edu"
-headcolor: "000080"
+headcolor: "100080"
 twitter: AaronGullickson
 github: AaronGullickson
 #linkedin: mariecurie
 date: "`r format(Sys.time(), '%B %d %Y')`"
 #aboutme: "Marie is a Polish and naturalized-French physicist and chemist who conducts pioneering research on radioactivity."
-output: vitae::hyndman
+output: 
+  vitae::hyndman:
+    keep_tex: no
 ---
 
 ```{r setup, include=FALSE}
