@@ -48,6 +48,7 @@ fix_with <- function(text) {
 
 ```{r read-data, include=FALSE}
 data_location = "https://docs.google.com/spreadsheets/d/1scjvE65qm5YXS-JG4-CRPiLEqsz6p4y34WX6ipEct_w/edit#gid=917338460"
+googlesheets4::gs4_deauth()
 cv_data <- googlesheets4::read_sheet(data_location, sheet = "entries", 
                                      skip = 1, col_types = "c")
 ```
@@ -94,6 +95,24 @@ cv_data %>%
      when=when,
      why=description_1)
 ```
+
+<!--## Currently Under Review
+
+```{r under-review}
+ cv_data %>%
+   filter(section=="under_review") %>%
+   mutate(what=extract_title(what),
+          where=remove_asterisks(where),
+          with=fix_with(with),
+          where=ifelse(is.na(with) | with=="", where, 
+                       glue("{where} ({with})"))) %>%
+   detailed_entries(
+     what=what,
+     where=where,
+     when=when,
+     why=description_1)
+```
+-->
 
 ## Grants Awarded
 
